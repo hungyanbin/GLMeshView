@@ -1,7 +1,5 @@
 package com.yanbin.threedview.view;
 
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,8 +50,6 @@ public class MeshParser {
             vertexData.add(Float.valueOf(point[1]));
             vertexData.add(Float.valueOf(point[2]));
             vertexData.add(Float.valueOf(point[3]));
-            Log.i("test", "add point:" + point[1] + ", " + point[2] + ", " + point[3]);
-
         }
     }
 
@@ -74,7 +70,6 @@ public class MeshParser {
             indiceData.add(Short.valueOf(point[1].split("/")[0]));
             indiceData.add(Short.valueOf(point[2].split("/")[0]));
             indiceData.add(Short.valueOf(point[3].split("/")[0]));
-            Log.i("test", "add index:" + point[1].split("/")[0] + ", " + point[2].split("/")[0] + ", " + point[3].split("/")[0]);
         }
     }
 
@@ -92,11 +87,8 @@ public class MeshParser {
             vertex[i] = vertexData.get(i);
 
         for(int i=0;i<indiceData.size();i++){
-            indice[i] = indiceData.get(i);
+            indice[i] = (short)(indiceData.get(i) - 1);
         }
-
-        Log.i("test", "vertex count:" + vertex.length);
-        Log.i("test", "indice count:" + indice.length);
 
         return new Mesh(vertex, indice);
     }

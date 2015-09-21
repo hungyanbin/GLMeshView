@@ -9,16 +9,17 @@ import android.view.MotionEvent;
 import com.yanbin.threedview.R;
 
 
-public class MyGLSurfaceView extends GLSurfaceView {
+public class MeshView extends GLSurfaceView {
 
     private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     private float mPreviousX;
     private float mPreviousY;
     private GLES20Renderer mRenderer;
     private int mColor;
+    private int meshFile;
     private Context context;
 
-    public MyGLSurfaceView(Context context) {
+    public MeshView(Context context) {
         super(context);
         init(context);
     }
@@ -28,24 +29,28 @@ public class MyGLSurfaceView extends GLSurfaceView {
         final int GL_VERSION = 2;
         setEGLContextClientVersion(GL_VERSION);
         setPreserveEGLContextOnPause(true);
-        GLES20Renderer renderer = new GLES20Renderer(context);
+
+        GLES20Renderer renderer = new GLES20Renderer(context, meshFile);
         renderer.setColor(mColor);
         setRenderer(renderer);
     }
 
 
-    public MyGLSurfaceView(Context context, AttributeSet attrs) {
+    public MeshView(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs,
-                R.styleable.MyGLSurfaceView);
+                R.styleable.MeshView);
         final int N = a.getIndexCount();
         for (int i = 0; i < N; ++i)
         {
             int attr = a.getIndex(i);
             switch (attr)
             {
-                case R.styleable.MyGLSurfaceView_shapeColor:
+                case R.styleable.MeshView_shapeColor:
                     mColor = a.getColor(attr, 0);
+                    break;
+                case R.styleable.MeshView_meshFile:
+                    meshFile = a.getResourceId(attr, 0);
                     break;
             }
         }

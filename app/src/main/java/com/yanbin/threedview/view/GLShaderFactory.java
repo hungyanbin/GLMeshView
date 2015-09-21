@@ -6,16 +6,10 @@ public class GLShaderFactory {
 
     public static final String FIELD_POSITION = "aPosition";
     public static final String FIELD_COLOR_VARYING = "vColor";
-    public static final String FIELD_COLOR_ATTRIBUTE = "aColor";
     public static final String FIELD_MATRIX_MVP = "uMVPMatrix";
 
     private static final int STATUS_FAIL = 0;
 
-    private static final String SHADER_CODE_VERTEX =
-            "attribute vec4 " + FIELD_POSITION  + ";" +
-            "void main(){" +
-            "   gl_Position = " + FIELD_POSITION  + ";" +
-            "}";
 
     private static final String SHADER_CODE_FRAGMENT =
             "precision mediump float;" +
@@ -50,8 +44,9 @@ public class GLShaderFactory {
         // If the compilation failed, delete the shader.
         if (compileStatus[0] == STATUS_FAIL)
         {
+            String errorLog = GLES20.glGetShaderInfoLog(shaderHandle);
             GLES20.glDeleteShader(shaderHandle);
-            throw new RuntimeException("shader compile error!!");
+            throw new RuntimeException("shader compile error!! " + errorLog);
         }
 
         return shaderHandle;
@@ -75,8 +70,9 @@ public class GLShaderFactory {
         // If the link failed, delete the program.
         if (linkStatus[0] == STATUS_FAIL)
         {
+            String errorLog = GLES20.glGetShaderInfoLog(shaderProgram);
             GLES20.glDeleteProgram(shaderProgram);
-            throw new GLRenderException("shader linking error!!");
+            throw new GLRenderException("shader linking error!! " + errorLog);
         }
 
         return shaderProgram;
