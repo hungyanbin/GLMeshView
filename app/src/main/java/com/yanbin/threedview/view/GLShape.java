@@ -21,7 +21,7 @@ public class GLShape {
 
     private float color[] = null;
 
-    private int faceCount;
+    private int indiceCount;
     private int vertexCount;
 
     private int mProgram;
@@ -29,6 +29,13 @@ public class GLShape {
 
     private GLShape(){
 
+    }
+
+    public void setMVPMatrix(float[] matrix){
+        final int ELEMENT_COUNT = 16;
+        if(matrix.length != ELEMENT_COUNT)
+            throw new GLRenderException("MVP Matrix element count must be 16");
+        mMVPMatrix = matrix;
     }
 
     public void draw(){
@@ -45,8 +52,7 @@ public class GLShape {
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
         GLES20.glUniform4fv(colorHandle, 1, color, 0);
 
-        GLES20.glDrawArrays(mDrawMode, 0, vertexCount);
-        //GLES20.glDrawElements(mDrawMode, faceCount, GLES20.GL_UNSIGNED_SHORT, indexBuffer);
+        GLES20.glDrawElements(mDrawMode, indiceCount, GLES20.GL_UNSIGNED_SHORT, indexBuffer);
 
         GLES20.glDisableVertexAttribArray(positionHandle);
     }
@@ -70,38 +76,34 @@ public class GLShape {
     }
 
     public static class Builder{
-        private float vertices[] = null;
-        private short indices[] = null;
+        private FloatBuffer vertices = null;
+        private ShortBuffer indices = null;
         private float color[];
+        private int indicesCount;
+        private int vertexCount;
 
         private int mDrawMode = GLES20.GL_TRIANGLE_FAN;
-        private float[] MVPMatrix;
 
         public Builder(Mesh mesh){
-            this.vertices = mesh.getVertex();
-            this.indices = mesh.getIndex();
-            if(vertices.length % VERTEX_DATA_COUNT != 0)
-                throw new IllegalArgumentException("coords length must multiples of 3, length : " + vertices.length);
-            if(indices.length % VERTEX_DATA_COUNT != 0)
-                throw new IllegalArgumentException("index length must multiples of 3, length : " + vertices.length);
+            this.vertices = floatArrayToBuffer(mesh.getVertex());
+            this.indices = shortArrayToBuffer(mesh.getIndex());
+
+            vertexCount = mesh.getVertex().length;
+            indicesCount = mesh.getIndex().length;
+
+            if(vertexCount % VERTEX_DATA_COUNT != 0)
+                throw new IllegalArgumentException("coords length must multiples of 3, length : " + vertexCount);
+            if(vertexCount % VERTEX_DATA_COUNT != 0)
+                throw new IllegalArgumentException("index length must multiples of 3, length : " + vertexCount);
+
+
         }
 
-        public Builder(float[] vertices){
-            this.vertices = vertices;
-        }
 
         public Builder color(float color[]){
             if(color.length % COLOR_DATA_COUNT != 0)
                 throw new IllegalArgumentException("color length must multiples of 4, length :" + color.length);
             this.color = color;
-            return this;
-        }
-
-        public Builder MVPMatrix(float[] matrix){
-            final int ELEMENT_COUNT = 16;
-            if(matrix.length != ELEMENT_COUNT)
-                throw new GLRenderException("MVP Matrix element count must be 16");
-            this.MVPMatrix = matrix;
             return this;
         }
 
@@ -117,15 +119,12 @@ public class GLShape {
         public GLShape build(){
             GLShape shape = new GLShape();
             shape.mProgram = GLShaderFactory.getDefaultShader();
-            shape.vertexBuffer = floatArrayToBuffer(vertices);
-            //shape.indexBuffer = shortArrayToBuffer(indices);
+            shape.vertexBuffer = vertices;
+            shape.indexBuffer = indices;
             shape.mDrawMode = mDrawMode;
-            shape.mMVPMatrix = MVPMatrix;
             shape.color = color;
-            //shape.faceCount = indices.length / VERTEX_DATA_COUNT;
-            shape.vertexCount = vertices.length / VERTEX_DATA_COUNT;
-            if(MVPMatrix == null)
-                throw new NullPointerException("must set MVPMatrix() before build()");
+            shape.indiceCount = indicesCount;
+            shape.vertexCount = vertexCount / VERTEX_DATA_COUNT;
 
             return shape;
         }

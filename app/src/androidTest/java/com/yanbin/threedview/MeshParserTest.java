@@ -25,7 +25,6 @@ public class MeshParserTest extends AndroidTestCase {
         MeshParser meshParser = new MeshParser(inputStream);
 
 
-        Log.i("test", "data:" + meshParser.parseVertex());
         assertTrue(true);
     }
 }

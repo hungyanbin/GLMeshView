@@ -21,6 +21,16 @@ public class GLShapeFactory {
         return meshParser.getParseResult();
     }
 
+    public static Mesh loadFromRaw(int rawId, Context context) throws IOException{
+        InputStream inputStream = context.getResources().openRawResource(rawId);
+
+        MeshParser meshParser = new MeshParser(inputStream);
+
+        meshParser.parseVertex();
+
+        return meshParser.getParseResult();
+    }
+
     public static float[] getCube(){
         return new float[]{
                 //front face

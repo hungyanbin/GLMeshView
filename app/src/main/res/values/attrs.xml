@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="MyGLSurfaceView">
+    <declare-styleable name="MeshView">
         <attr name="shapeColor" format="color"/>
+        <attr name="meshFile" format="reference"/>
     </declare-styleable>
 </resources>
 

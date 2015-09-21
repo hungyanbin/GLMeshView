@@ -1,8 +1,5 @@
 package com.yanbin.threedview.view;
 
-/**
- * Created by 彥彬 on 2015/4/5.
- */
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
@@ -11,7 +8,7 @@ import java.io.IOException;
 
 public class GLES20Renderer extends GLRenderer {
 
-    private GLShape.Builder cubeBuilder;
+    private GLShape mesh;
     private float COLOR_DEFAULT[] = {1.0f, 1.0f, 1.0f, 1.0f};
     private float[] shapeColor = COLOR_DEFAULT;
 
@@ -19,9 +16,11 @@ public class GLES20Renderer extends GLRenderer {
     private final float[] mAccumulatedRotation = new float[16];
 
     private Context context;
+    private int meshId;
 
-    public GLES20Renderer(Context context){
+    public GLES20Renderer(Context context, int meshId){
         this.context = context;
+        this.meshId = meshId;
     }
 
     @Override
@@ -31,16 +30,19 @@ public class GLES20Renderer extends GLRenderer {
 
         // Use culling to remove back faces.
         GLES20.glEnable(GLES20.GL_CULL_FACE);
-        //GLES20.glFrontFace(GLES20.GL_CCW);
-       // GLES20.glCullFace(GLES20.GL_BACK);
 
         // Enable depth testing
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
         initProjectionMatrix(width, height);
-            cubeBuilder = new GLShape.Builder(GLShapeFactory.getCube());
-            cubeBuilder.drawMode(GLES20.GL_TRIANGLES)
-                .color(shapeColor);
+        try {
+            mesh = new GLShape.Builder(GLShapeFactory.loadFromRaw(meshId, context))
+                    .drawMode(GLES20.GL_TRIANGLES)
+                    .color(shapeColor)
+                    .build();
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Cannot open this file!! ");
+        }
         Matrix.setIdentityM(mAccumulatedRotation, 0);
     }
 
@@ -81,8 +83,8 @@ public class GLES20Renderer extends GLRenderer {
         Matrix.setIdentityM(mTransMatrix, 0);
         float[] mMVPMatrix = getMVPMatrix(mTransMatrix);
 
-        GLShape cube = cubeBuilder.MVPMatrix(mMVPMatrix).build();
-        cube.draw();
+        mesh.setMVPMatrix(mMVPMatrix);
+        mesh.draw();
     }
 
     private void updateTouchRotationMatrix(){
@@ -114,7 +116,7 @@ public class GLES20Renderer extends GLRenderer {
         if(mViewMatrix == null) {
             float eyeX = 0f;
             float eyeY = 0f;
-            float eyeZ = -4f;
+            float eyeZ = -10f;
             float centerX = 0f;
             float centerY = 0f;
             float centerZ = 0f;
