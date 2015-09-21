@@ -24,6 +24,7 @@ public class MeshParser {
         vertexData = new ArrayList<>();
         indiceData = new ArrayList<>();
 
+        addDumpPoint();
         try {
             while ((line = in.readLine()) != null) {
                 addVertexByLine(line);
@@ -38,6 +39,13 @@ public class MeshParser {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void addDumpPoint(){
+        //because obj file is 1-based, so add one dump point for correct indexing
+        vertexData.add(0f);
+        vertexData.add(0f);
+        vertexData.add(0f);
     }
 
     private void addVertexByLine(String line){
@@ -86,9 +94,8 @@ public class MeshParser {
         for(int i=0;i<vertexData.size();i++)
             vertex[i] = vertexData.get(i);
 
-        for(int i=0;i<indiceData.size();i++){
-            indice[i] = (short)(indiceData.get(i) - 1);
-        }
+        for(int i=0;i<indiceData.size();i++)
+            indice[i] = indiceData.get(i);
 
         return new Mesh(vertex, indice);
     }
