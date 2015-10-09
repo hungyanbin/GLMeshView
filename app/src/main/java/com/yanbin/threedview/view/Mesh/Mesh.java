@@ -1,4 +1,4 @@
-package com.yanbin.threedview.view;
+package com.yanbin.threedview.view.Mesh;
 
 /**
  * Created by 彥彬 on 2015/9/20.
