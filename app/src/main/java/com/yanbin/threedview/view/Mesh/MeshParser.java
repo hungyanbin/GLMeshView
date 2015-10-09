@@ -1,4 +1,4 @@
-package com.yanbin.threedview.view;
+package com.yanbin.threedview.view.Mesh;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,8 +10,8 @@ import java.util.List;
 public class MeshParser {
 
     private InputStream meshStream;
-    private List<Float> vertexData;
-    private List<Short> indiceData;
+    private List<Float> vertices;
+    private List<Short> vertexIndice;
 
     public MeshParser(InputStream meshStream){
         this.meshStream = meshStream;
@@ -21,8 +21,8 @@ public class MeshParser {
         BufferedReader in = new BufferedReader(new InputStreamReader(meshStream));
         String line;
 
-        vertexData = new ArrayList<>();
-        indiceData = new ArrayList<>();
+        vertices = new ArrayList<>();
+        vertexIndice = new ArrayList<>();
 
         addDumpPoint();
         try {
@@ -41,11 +41,11 @@ public class MeshParser {
         }
     }
 
+    //because obj file is 1-based, so add one dump point for correct indexing
     private void addDumpPoint(){
-        //because obj file is 1-based, so add one dump point for correct indexing
-        vertexData.add(0f);
-        vertexData.add(0f);
-        vertexData.add(0f);
+        vertices.add(0f);
+        vertices.add(0f);
+        vertices.add(0f);
     }
 
     private void addVertexByLine(String line){
@@ -55,9 +55,9 @@ public class MeshParser {
 
         String[] point = line.split(" ");
         if(point.length == pointCoorCount){
-            vertexData.add(Float.valueOf(point[1]));
-            vertexData.add(Float.valueOf(point[2]));
-            vertexData.add(Float.valueOf(point[3]));
+            vertices.add(Float.valueOf(point[1]));
+            vertices.add(Float.valueOf(point[2]));
+            vertices.add(Float.valueOf(point[3]));
         }
     }
 
@@ -75,9 +75,9 @@ public class MeshParser {
 
         String[] point = line.split(" ");
         if(point.length == pointCoorCount){
-            indiceData.add(Short.valueOf(point[1].split("/")[0]));
-            indiceData.add(Short.valueOf(point[2].split("/")[0]));
-            indiceData.add(Short.valueOf(point[3].split("/")[0]));
+            vertexIndice.add(Short.valueOf(point[1].split("/")[0]));
+            vertexIndice.add(Short.valueOf(point[2].split("/")[0]));
+            vertexIndice.add(Short.valueOf(point[3].split("/")[0]));
         }
     }
 
@@ -89,13 +89,13 @@ public class MeshParser {
     }
 
     public Mesh getParseResult(){
-        float[] vertex = new float[vertexData.size()];
-        short[] indice = new short[indiceData.size()];
-        for(int i=0;i<vertexData.size();i++)
-            vertex[i] = vertexData.get(i);
+        float[] vertex = new float[vertices.size()];
+        short[] indice = new short[vertexIndice.size()];
+        for(int i=0;i< vertices.size();i++)
+            vertex[i] = vertices.get(i);
 
-        for(int i=0;i<indiceData.size();i++)
-            indice[i] = indiceData.get(i);
+        for(int i=0;i< vertexIndice.size();i++)
+            indice[i] = vertexIndice.get(i);
 
         return new Mesh(vertex, indice);
     }
